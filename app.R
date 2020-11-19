@@ -6,6 +6,7 @@ library(gghighlight)
 library(plotly)
 library(beeswarm)
 library(ggrepel)
+library(writexl)
 
 ui <- fluidPage(titlePanel("EDA with Shiny", title=div(img(height = 100, width = 120, src="logo.png"))),
                 theme = shinytheme("cosmo"),
@@ -26,8 +27,6 @@ ui <- fluidPage(titlePanel("EDA with Shiny", title=div(img(height = 100, width =
                     helpText("Static & interactive graphs"),
                     uiOutput("xplotly"),
                     uiOutput("yplotly"),
-                    uiOutput("sizely"),
-                    uiOutput("title"),
                     tags$hr(),
                     helpText("Table"),
                     uiOutput("nytabel"),
@@ -36,8 +35,12 @@ ui <- fluidPage(titlePanel("EDA with Shiny", title=div(img(height = 100, width =
                 mainPanel(
                     tabsetPanel(id = "dataset",
                                 tabPanel("Compare player", plotOutput("compplot")),
-                                tabPanel("Static graph", plotOutput("plot")),
-                                tabPanel("Interactive graph", plotlyOutput("plotly")),
+                                tabPanel("Static graph", plotOutput("plot"),
+                                         helpText("Put your name in the caption and right-click on plot to download"),
+                                uiOutput("title")),
+                                tabPanel("Interactive graph", plotlyOutput("plotly"),
+                                         helpText("Activate the graph by choosing size of points below"),
+                                uiOutput("sizely")),
                                 tabPanel("Table", DT::dataTableOutput("rendered_file"))
                     )),
 )
@@ -104,19 +107,22 @@ server <- function(input,output,session) {
     })
     
     output$sizely <- renderUI({
-        selectizeInput(inputId = "sizely",
-                       label = "Size of point",
+      selectizeInput(inputId = "sizely",
+                       label = "",
                        choices = (names(df())), options = list(
-                           placeholder = "Apply numeric variable for interactive graph",
+                           placeholder = "Apply a numeric variable",
                            onInitialize = I('function() { this.setValue(""); }')),
                        multiple = FALSE)
+      
         
     })
     
     output$title <- renderUI({
-        textInput("caption", "Your name in caption")
+        textInput("caption", "",
+                  placeholder = "Write your name or handle")
         
     })
+    
     
     output$nytabel <- renderUI({
         selectizeInput(inputId = "select_tab", 
@@ -128,7 +134,7 @@ server <- function(input,output,session) {
                        multiple = TRUE)
         
     })
-    
+  
     
     df_sel <- reactive({
         req(input$select_var)
@@ -180,9 +186,11 @@ server <- function(input,output,session) {
     output$plot <- renderPlot({
         
         ggplot(df(), aes_string(x = as.name(input$xplotly), y = as.name(input$yplotly))) +
-        geom_point(alpha = 0.5) +
-        geom_text_repel(label = df()$Player) +
+        geom_point(alpha = 0.2) +
+        geom_text(aes(label = df()$Player)) +
         labs(caption = paste0("Created by ", input$caption," with courtesy of data_scimon")) 
+        
+  
       
     })
     
@@ -204,6 +212,7 @@ server <- function(input,output,session) {
         df_tab()
         
     })
+
     
 }
 
