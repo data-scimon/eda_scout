@@ -5,8 +5,8 @@ account: simonsjen
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3252350
-bundleId: 3873127
+bundleId: 3882278
 url: https://simonsjen.shinyapps.io/eda_scout/
-when: 1605646108.08516
+when: 1605822574.68871
 asMultiple: FALSE
 asStatic: FALSE

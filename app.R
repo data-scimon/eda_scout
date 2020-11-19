@@ -19,7 +19,7 @@ ui <- fluidPage(titlePanel("EDA with Shiny", title=div(img(height = 100, width =
                     helpText(""),  
                     fileInput('files', "Upload Wyscout-file (.xslx format)", accept = c('.xlsx')),
                     tags$hr(),
-                    helpText("Compare a player"),
+                    helpText("Compare player"),
                     uiOutput("spiller_sammenlign"),
                     helpText(""),
                     uiOutput("sammenlign"),
